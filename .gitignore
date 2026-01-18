@@ -1,0 +1,9 @@
+.env
+.env.*
+*.key
+*.pem
+*.crt
+*.p12
+secrets.yaml
+config/secrets.*
+.fut
