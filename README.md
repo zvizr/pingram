@@ -10,6 +10,7 @@ at the core of Pingram.
 - Simple bot initilizer
 
 ## Quickstart
+
 ```bash
 pip install pingram
 ```
