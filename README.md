@@ -9,6 +9,11 @@ at the core of Pingram.
 - Uses httpx under the hood
 - Simple bot initilizer
 
+## Quickstart
+```bash
+pip install pingram
+```
+
 ## Example
 
 ### Basic Usage
