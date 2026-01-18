@@ -38,24 +38,6 @@ bot.send("doc",
         "caption": "Test Doc"})
 ```
 
-### Sending Audio
-
-```python
-bot.send("audio", 
-        {"chat_id": 123456789, 
-        "path": "<URL/FILE PATH>", 
-        "caption": "Test Audio"})
-```
-
-### Sending Video
-
-```python
-bot.send("video", 
-        {"chat_id": 123456789, 
-        "path": "<URL/FILE PATH>", 
-        "caption": "Test Video"})
-```
-
 ##  Advantages
 
 - Eliminate internal SMTP costs and complexity
