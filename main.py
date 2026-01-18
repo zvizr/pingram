@@ -38,7 +38,7 @@ class Pingram():
             raise ConnectionError(f'POST Request Failed: {e}')
         
         
-    def me(self): return self._get('me')
+    def me(self) -> httpx.Response : return self._get('me')
         
         
     def send_photo(self, chat_id: str, path: str, **kwargs) -> httpx.Response:
