@@ -1,25 +1,73 @@
-# Pingram
+    # Pingram
 
-Ultra lightweight Python wrapper for Telegram messaging using your bot - an alternative to email/sms as a costless solution to sending messages. Pingram enforces non-conversational ping esque messaging, outbound messaging is
-at the core of Pingram.
+    Ultra lightweight Python wrapper for Telegram messaging using your bot - an alternative to email/sms as a costless solution to sending messages. Pingram enforces non-conversational ping esque messaging, outbound messaging is
+    at the core of Pingram.
 
-## Features
+    ## Features
 
-- Send messages
-- Uses httpx under the hood
-- Simple bot initilizer
+    - Send messages
+    - Uses httpx under the hood
+    - Simple bot initilizer
 
-## Example
+    ## Example
 
-```python
-from pingram import Pingram
+    ### Basic Usage
 
-bot = Pingram(token="<BOT_TOKEN>")
-bot.send("msg", {"chat_id": 123456789, "text": "Hello World"})
-```
+    ```python
+    from pingram import Pingram
 
-## Coming Soon
+    bot = Pingram(token="<BOT_TOKEN>")
+    bot.send("msg", {"chat_id": 123456789, "text": "Hello World"})
+    ```
 
-- Image, document sending methods
-- Error handling and retries
-- Asynchronous client
+    ### Sending Images
+
+    ```python
+    bot.send("photo", 
+            {"chat_id": 123456789, 
+            "path": "<URL/FILE PATH>", 
+            "caption": "Test Photo"})
+    ```
+
+    ### Sending Documents
+
+    ```python
+    bot.send("doc", 
+            {"chat_id": 123456789, 
+            "path": "<URL/FILE PATH>", 
+            "caption": "Test Doc"})
+    ```
+
+    ### Sending Audio
+
+    ```python
+    bot.send("audio", 
+            {"chat_id": 123456789, 
+            "path": "<URL/FILE PATH>", 
+            "caption": "Test Audio"})
+    ```
+
+    ### Sending Video
+
+    ```python
+    bot.send("video", 
+            {"chat_id": 123456789, 
+            "path": "<URL/FILE PATH>", 
+            "caption": "Test Video"})
+    ```
+
+    ##  Advantages
+
+    - Eliminate internal SMTP costs and complexity
+    - Eliminiate internal SMS-related expenses
+    - Zero maintenance overheard - no servers to manage, no spam filters to fight
+    - Low operational complexity - works with a single Telegram bot token
+    - Minimal code footprint, easy to audit, integrate and exend
+    - Acts as an alternative transport layer for events, alerts or push messaging
+
+
+    ## Coming Soon
+
+    - Image, document sending methods
+    - Error handling and retries
+    - Asynchronous client
