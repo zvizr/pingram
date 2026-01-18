@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pingram"
+version = "0.2.0"
+description = "Minimal Telegram alerting framework for bots and scripts."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "zvizr" }]
+
+keywords = [
+  "telegram", "bot", "alert", "notification", "notifier", "push",
+  "messaging", "python", "minimal", "selfhosted", "cli",
+  "automation", "infra", "monitoring"
+]
+
+dependencies = [
+    "httpx"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

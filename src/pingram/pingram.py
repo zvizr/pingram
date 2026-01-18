@@ -1,3 +1,10 @@
+
+# SPDX-FileCopyrightText: 2026-present zvizr <zvizr@proton.me>
+#
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026-present zvizr <zvizr@proton.me>
+#
+# SPDX-License-Identifier: MIT
 from typing import Any
 
 import httpx
@@ -63,6 +70,29 @@ class Pingram():
         with open(path, 'rb') as f:
             files = {'document': f}
             return self._post('doc', data=data, files=files)
+        
+    def send_audio(self, chat_id: str, path: str, **kwargs) -> httpx.Response:
+        data = {'chat_id': chat_id, **kwargs}
+        
+        if path.startswith('http'):
+            data['audio'] = path
+            return self._post('audio', data=data)
+        
+        with open(path, 'rb') as f:
+            files = {'audio': f}
+            return self._post('audio', data=data, files=files)
+        
+    def send_video(self, chat_id: str, path: str, **kwargs) -> httpx.Response:
+        data = {'chat_id': chat_id, **kwargs}
+        
+        if path.startswith('http'):
+            data['video'] = path
+            return self._post('audio', data=data)
+        
+        with open(path, 'rb') as f:
+            files = {'video': f}
+            return self._post('audio', data=data, files=files)
+        
     
     
     def send(self, endpoint: str, payload: dict[str, Any] | None = None, **kwargs) -> httpx.Response | str:

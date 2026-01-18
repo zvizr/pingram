@@ -1,0 +1,89 @@
+Metadata-Version: 2.4
+Name: pingram
+Version: 0.2.0
+Summary: Minimal Telegram alerting framework for bots and scripts.
+Author: zvizr
+License: MIT License
+        
+        Copyright (c) [2026] [zvizr]
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Keywords: telegram,bot,alert,notification,notifier,push,messaging,python,minimal,selfhosted,cli,automation,infra,monitoring
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: httpx
+Dynamic: license-file
+
+# Pingram
+
+Ultra lightweight Python wrapper for Telegram messaging using your bot - an alternative to email/sms as a costless solution to sending messages. Pingram enforces non-conversational ping esque messaging, outbound messaging is
+at the core of Pingram.
+
+## Features
+
+- Send messages
+- Uses httpx under the hood
+- Simple bot initilizer
+
+## Example
+
+### Basic Usage
+
+```python
+from pingram import Pingram
+
+bot = Pingram(token="<BOT_TOKEN>")
+bot.send("msg", {"chat_id": 123456789, "text": "Hello World"})
+```
+
+### Sending Images
+
+```python
+bot.send("photo", 
+        {"chat_id": 123456789, 
+        "path": "<URL/FILE PATH>", 
+        "caption": "Test Photo"})
+```
+
+### Sending Documents
+
+```python
+bot.send("doc", 
+        {"chat_id": 123456789, 
+        "path": "<URL/FILE PATH>", 
+        "caption": "Test Doc"})
+```
+
+##  Advantages
+
+- Eliminate internal SMTP costs and complexity
+- Eliminiate internal SMS-related expenses
+- Zero maintenance overheard - no servers to manage, no spam filters to fight
+- Low operational complexity - works with a single Telegram bot token
+- Minimal code footprint, easy to audit, integrate and exend
+- Acts as an alternative transport layer for events, alerts or push messaging
+
+
+## Coming Soon
+
+- Audio, video sending methods
+- Error handling and retries
+- Asynchronous client

@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+src/pingram/__init__.py
+src/pingram/pingram.py
+src/pingram.egg-info/PKG-INFO
+src/pingram.egg-info/SOURCES.txt
+src/pingram.egg-info/dependency_links.txt
+src/pingram.egg-info/requires.txt
+src/pingram.egg-info/top_level.txt

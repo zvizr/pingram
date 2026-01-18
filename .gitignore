@@ -6,4 +6,6 @@
 *.p12
 secrets.yaml
 config/secrets.*
-.fut
+*.fut
+.futvenv/
+.venv
