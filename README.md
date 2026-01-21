@@ -26,6 +26,15 @@ bot = Pingram(token="<BOT_TOKEN>")
 bot.message(chat_id=123456789, text="Hello Friend")
 ```
 
+Since every high-level api function returns a http.Response object, you can append the end of a function call using ```.text``` to show the raw HTTP response instead of the status code.
+
+```python
+bot.message(chat_id=123456789, text="Hello Friend").text
+```
+
+This particular call will return a success of failure message from the Telegram API.
+
+
 ## Media Examples
 
 Send Photo
@@ -78,6 +87,22 @@ bot.send_video(
     caption="Security Footage"
 )
 ```
+
+## Additional Request Data
+
+Including additional data such as a caption, description or any other key, value types supported by the Telegram API can be passed through any API call simply by including it in the params of the function.
+
+```python
+bot.send_video(
+        chat_id=123456789,
+        path="hamsters.mp4",
+        caption="Playful Hamsters",
+        has_spoiler=True
+)
+```
+
+We included an additional "has_spoiler" parameter that requires interpolation of a bool data type.
+
 
 ## Benefits
 
