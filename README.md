@@ -81,18 +81,18 @@ bot.send_video(
 
 ## Benefits
 
-• Eliminates SMTP and SMS costs
-• No server or inbound infra required
-• Uses only a Telegram bot token
-• Lightweight and auditable codebase
-• Ideal for scripts, automation, and event pings
-• Seamless integration with CLI tools, logs, or system alerts
+- Eliminates SMTP and SMS costs
+- No server or inbound infra required
+- Uses only a Telegram bot token
+- Lightweight and auditable codebase
+- Ideal for scripts, automation, and event pings
+- Seamless integration with CLI tools, logs, or system alerts
 
 ## Planned features
 
-• Retry and error handling
-• Async mode (httpx.AsyncClient)
-• Message templating engine
-• Std input/message collectors
-• Webhook-to-Telegram bridge
-• Package tests and CI integration
+- Retry and error handling
+- Async mode (httpx.AsyncClient)
+- Message templating engine
+- Std input/message collectors
+- Webhook-to-Telegram bridge
+- Package tests and CI integration
