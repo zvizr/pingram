@@ -1,61 +1,98 @@
+
 # Pingram
 
-Ultra lightweight Python wrapper for Telegram messaging using your bot - an alternative to email/sms as a costless solution to sending messages. Pingram enforces non-conversational ping esque messaging, outbound messaging is
-at the core of Pingram.
+Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram messages via your bot. It’s designed as a cost-free alternative to email and SMS, focused on one-way “ping”-style messaging — ideal for alerts, reports, logs, and automated notifications.
 
 ## Features
 
-- Send messages
-- Uses httpx under the hood
-- Simple bot initilizer
+- Send messages, photos, documents, audio, and video
+- Direct method calls: `bot.message`, `bot.send_photo`, etc.
+- Minimalistic architecture (single file, no external listeners)
+- Built on `httpx` (sync client)
+- No webhook setup or event loop required
 
-## Quickstart
+## Installation
 
 ```bash
 pip install pingram
 ```
 
-## Example
-
-### Basic Usage
+## Quickstart
 
 ```python
 from pingram import Pingram
 
 bot = Pingram(token="<BOT_TOKEN>")
-bot.send("msg", {"chat_id": 123456789, "text": "Hello World"})
+bot.message(chat_id=123456789, text="Hello Friend")
 ```
 
-### Sending Images
+## Media Examples
+
+Send Photo
 
 ```python
-bot.send("photo", 
-        {"chat_id": 123456789, 
-        "path": "<URL/FILE PATH>", 
-        "caption": "Test Photo"})
+bot.send_photo(
+    chat_id=123456789,
+    path="https://example.com/image.jpg",
+    caption="Test Photo"
+)
 ```
 
-### Sending Documents
+### From local file:
 
 ```python
-bot.send("doc", 
-        {"chat_id": 123456789, 
-        "path": "<URL/FILE PATH>", 
-        "caption": "Test Doc"})
+bot.send_photo(
+    chat_id=123456789,
+    path="photo.jpg",
+    caption="Local Image"
+)
 ```
 
-##  Advantages
 
-- Eliminate internal SMTP costs and complexity
-- Eliminiate internal SMS-related expenses
-- Zero maintenance overheard - no servers to manage, no spam filters to fight
-- Low operational complexity - works with a single Telegram bot token
-- Minimal code footprint, easy to audit, integrate and exend
-- Acts as an alternative transport layer for events, alerts or push messaging
+## Send Document
 
+```python
+bot.send_doc(
+    chat_id=123456789,
+    path="https://example.com/file.pdf",
+    caption="Monthly Report"
+)
+```
 
-## Coming Soon
+## Send Audio
 
-- Audio, video sending methods
-- Error handling and retries
-- Asynchronous client
+```python
+bot.send_audio(
+    chat_id=123456789,
+    path="audio.mp3",
+    caption="Shower Thoughts"
+)
+```
+
+## Send Video
+
+```python
+bot.send_video(
+    chat_id=123456789,
+    path="https://example.com/clip.mp4",
+    caption="Security Footage"
+)
+```
+
+## Benefits
+
+• Eliminates SMTP and SMS costs
+• No server or inbound infra required
+• Uses only a Telegram bot token
+• Lightweight and auditable codebase
+• Ideal for scripts, automation, and event pings
+• Seamless integration with CLI tools, logs, or system alerts
+
+## Planned features
+
+• Retry and error handling
+• Async mode (httpx.AsyncClient)
+• Message templating engine
+• Std input/message collectors
+• Webhook-to-Telegram bridge
+• Package tests and CI integration
