@@ -5,7 +5,7 @@
 # SPDX-FileCopyrightText: 2026-present zvizr <zvizr@proton.me>
 #
 # SPDX-License-Identifier: MIT
-from typing import Any
+from typing import Any, Union
 
 import httpx
 
@@ -35,15 +35,15 @@ class Pingram:
     def me(self) -> httpx.Response:
         return self._get('me')
 
-    def message(self, chat_id: str, text: str, **kwargs) -> httpx.Response:
-        return self._post('msg', {'chat_id': chat_id, 'text': text, **kwargs})
+    def message(self, chat_id: Union[str,int], text: str, **kwargs) -> httpx.Response:
+        return self._post('msg', {'chat_id': str(chat_id), 'text': text, **kwargs})
 
-    def send_photo(self, chat_id: str, path: str, caption=None, **kwargs) -> httpx.Response:
+    def send_photo(self, chat_id: Union[str,int], path: str, caption=None, **kwargs) -> httpx.Response:
         """
         The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20
         Max file size is 10 MB
         """
-        data = {'chat_id': chat_id, **kwargs}
+        data = {'chat_id': str(chat_id), **kwargs}
         if caption: data['caption'] = caption
         if path.startswith('http'):
             data['photo'] = path
@@ -51,12 +51,12 @@ class Pingram:
         with open(path, 'rb') as f:
             return self._post('photo', data, files={'photo': f})
 
-    def send_doc(self, chat_id: str, path: str, caption=None, **kwargs) -> httpx.Response:
+    def send_doc(self, chat_id: Union[str,int], path: str, caption=None, **kwargs) -> httpx.Response:
         """
         Any document file format accepted
         Max file size is 50 MB
         """
-        data = {'chat_id': chat_id, **kwargs}
+        data = {'chat_id': str(chat_id), **kwargs}
         if caption: data['caption'] = caption
         if path.startswith('http'):
             data['document'] = path
@@ -64,24 +64,24 @@ class Pingram:
         with open(path, 'rb') as f:
             return self._post('doc', data, files={'document': f})
 
-    def send_audio(self, chat_id: str, path: str, **kwargs) -> httpx.Response:
+    def send_audio(self, chat_id: Union[str,int], path: str, **kwargs) -> httpx.Response:
         """
         Audio must be in the .MP3 or .M4A format
         Max file size is 50 MB
         """
-        data = {'chat_id': chat_id, **kwargs}
+        data = {'chat_id': str(chat_id), **kwargs}
         if path.startswith('http'):
             data['audio'] = path
             return self._post('audio', data)
         with open(path, 'rb') as f:
             return self._post('audio', data, files={'audio': f})
 
-    def send_video(self, chat_id: str, path: str, **kwargs) -> httpx.Response:
+    def send_video(self, chat_id: Union[str,int], path: str, **kwargs) -> httpx.Response:
         """
         Telegram clients support MPEG4 videos (other formats may be sent as Document)
         Max file size is 50 MB
         """
-        data = {'chat_id': chat_id, **kwargs}
+        data = {'chat_id': str(chat_id), **kwargs}
         if path.startswith('http'):
             data['video'] = path
             return self._post('video', data)

@@ -4,12 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pingram"
-version = "0.3.2"
+version = "0.3.3"
 description = "Minimal Telegram alerting framework for bots and scripts."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.7"
 license = { file = "LICENSE" }
 authors = [{ name = "zvizr" }]
+
+dependencies = ["httpx"]
 
 keywords = [
   "telegram", "bot", "alert", "notification", "notifier", "push",
@@ -17,12 +19,24 @@ keywords = [
   "automation", "infra", "monitoring"
 ]
 
-dependencies = [
-    "httpx"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[project.urls]
+Homepage = "https://github.com/zvizr/pingram"
+Repository = "https://github.com/zvizr/pingram"
+Issues = "https://github.com/zvizr/pingram/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+exclude = ["tests*"]
