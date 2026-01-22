@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pingram
-Version: 0.3.1
+Version: 0.3.3
 Summary: Minimal Telegram alerting framework for bots and scripts.
 Author: zvizr
 License: MIT License
@@ -25,25 +25,75 @@ License: MIT License
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
         
+Project-URL: Homepage, https://github.com/zvizr/pingram
+Project-URL: Repository, https://github.com/zvizr/pingram
+Project-URL: Issues, https://github.com/zvizr/pingram/issues
 Keywords: telegram,bot,alert,notification,notifier,push,messaging,python,minimal,selfhosted,cli,automation,infra,monitoring
-Requires-Python: >=3.9
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: httpx
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
 Dynamic: license-file
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/pingram?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pingram)
+[![Python](https://img.shields.io/pypi/pyversions/pingram)](https://pypi.org/project/pingram/)
+[![PyPI version](https://badge.fury.io/py/pingram.svg)](https://badge.fury.io/py/pingram)
+[![License](https://img.shields.io/github/license/zvizr/pingram)](LICENSE)
 
 # Pingram
+Send Telegram messages with one line of Python. No webhooks. No bloat. Just pings.
 
 Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram messages via your bot. It’s designed as a cost-free alternative to email and SMS, focused on one-way “ping”-style messaging — ideal for alerts, reports, logs, and automated notifications.
 
-## Features
+> Looking for a minimal alternative to `python-telegram-bot`? Pingram avoids the event loop, handlers, and 7.8MB install size, focusing solely on *outbound pings* with just one method per use case.
+
+---
+
+## ⚡️ Lightweight by Design
+
+Pingram prioritizes size, speed, and clarity. Designed to be imported and deployed instantly.
+
+| Package            | Size        |
+|--------------------|-------------|
+| Pingram (core)     | ~20 KB      |
+| Pingram + httpx    | ~800 KB     |
+| python-telegram-bot| ~7.8 MB     |
+
+
+Result:
+
+- Pingram is **over 9× smaller** than PTB even with `httpx` included.
+- Pingram core is **~390× smaller** than PTB alone.
+- That's a ~90% reduction with dependencies, and ~99.7% without.
+
+
+Perfect for:
+
+- Minimal Docker containers  
+- Constrained environments  
+- Clean, single-purpose automation  
+
+## ✅ Features
 
 - Send messages, photos, documents, audio, and video
-- Direct method calls: `bot.message`, `bot.send_photo`, etc.
-- Minimalistic architecture (single file, no external listeners)
-- Built on `httpx` (sync client)
+- Direct method calls: `bot.message()`, `bot.send_photo()`, etc.
+- Minimalistic architecture (single file, no listeners or webhooks)
+- Built on `httpx` (sync)
 - No webhook setup or event loop required
+
+## 👤 Who is it for?
+
+- Developers who want zero-setup Telegram alerts
+- Sysadmins replacing email/SMS for cron/CI jobs
+- Raspberry Pi or IoT projects needing compact tooling
+- Traders, scrapers, and bots that need lightweight push
 
 ## Installation
 
@@ -57,12 +107,25 @@ pip install pingram
 from pingram import Pingram
 
 bot = Pingram(token="<BOT_TOKEN>")
-bot.message(chat_id=123456789, text="Hello Friend")
+bot.me()
+```
+> *A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a User object.* https://core.telegram.org/bots/api#getme
+
+Since every high-level api function returns a http.Response object, you can append the end of a function call using ```.text``` to show the raw HTTP response instead of the status code.
+
+```python
+bot.message(chat_id=123456789, text="Hello Friend").text
 ```
 
-## Media Examples
+This call returns a success or error message from the Telegram API.
 
-Send Photo
+
+## 📷 Media Examples
+
+> All media-sending methods accept both local file paths and direct URLs.  
+> Ensure URLs are direct links (i.e. ending in `.jpg`, `.mp4`, `.pdf`) and serve correct `Content-Type` headers.
+
+### Send Photo
 
 ```python
 bot.send_photo(
@@ -72,7 +135,7 @@ bot.send_photo(
 )
 ```
 
-### From local file:
+From a local file:
 
 ```python
 bot.send_photo(
@@ -82,8 +145,7 @@ bot.send_photo(
 )
 ```
 
-
-## Send Document
+### Send Document
 
 ```python
 bot.send_doc(
@@ -93,7 +155,27 @@ bot.send_doc(
 )
 ```
 
-## Send Audio
+From a local file:
+
+```python
+bot.send_doc(
+    chat_id=123456789,
+    path="report.pdf",
+    caption="Monthly Report"
+)
+```
+
+### Send Audio
+
+```python
+bot.send_audio(
+    chat_id=123456789,
+    path="https://www.myinstants.com//media/sounds/hello-friend-mr-robot.mp3",
+    caption="Greetings."
+)
+```
+
+From a local file:
 
 ```python
 bot.send_audio(
@@ -103,24 +185,72 @@ bot.send_audio(
 )
 ```
 
-## Send Video
+### Send Video
 
 ```python
 bot.send_video(
     chat_id=123456789,
-    path="https://example.com/clip.mp4",
+    path="https://yourdomain.com/video.mp4",  # must be direct link to .mp4
     caption="Security Footage"
 )
 ```
 
-## Benefits
+From a local file:
 
-- Eliminates SMTP and SMS costs
-- No server or inbound infra required
-- Uses only a Telegram bot token
-- Lightweight and auditable codebase
-- Ideal for scripts, automation, and event pings
-- Seamless integration with CLI tools, logs, or system alerts
+```python
+bot.send_video(
+    chat_id=123456789,
+    path="stranger.mp4",
+    caption="Security Footage"
+)
+```
+
+
+## 📦 Additional Request Data
+
+Including additional data such as a caption, description or any other key, value types supported by the Telegram API can be passed through any API call simply by including it in the params of the function.
+
+```python
+bot.send_video(
+    chat_id=123456789,
+    path="hamsters.mp4",
+    caption="Playful Hamsters",
+    has_spoiler=True
+)
+```
+
+> The has_spoiler parameter is a native Telegram option. It must be passed as a bool.
+
+## 💡 Benefits
+
+- Zero dependencies (core only) — optional httpx for HTTP transport
+- Drop-in compatible with shell scripts, cron jobs, CI pipelines, and Python daemons
+- Portable single-file design — easy to vendor or embed in other tools
+- No auth handshakes or token refreshes — Telegram bots use static tokens
+- Reliable delivery with near-instant notifications across devices
+- Bypasses email blacklists and spam filters
+- Built for automation — ideal for alerts, monitoring, backups, and trading systems
+- Rich media support — send screenshots, logs, documents, audio, and video
+- Predictable return values — inspect status_code, .text, or .json() directly
+- Excellent replacement for SMTP, SMS, or third-party notification APIs
+- Runs anywhere Python runs — from Raspberry Pi to cloud VMs
+- No app approval or webhook infrastructure required
+
+## Tests
+
+Pingram includes a real-world test suite (no mocks). Tests send actual messages to verify API behavior, which is useful for edge-case detection (e.g., rate limits, content type mismatches).
+
+To run the tests:
+
+```bash
+# Ensure .env has BOT_TOKEN and CHAT_ID
+# .env example:
+# BOT_TOKEN=123456789:ABCDEF
+# CHAT_ID=123456789
+pytest
+# To include test failure messages you can use:
+pytest -rs
+```
 
 ## Planned features
 
