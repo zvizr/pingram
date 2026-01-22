@@ -8,3 +8,9 @@ src/pingram.egg-info/SOURCES.txt
 src/pingram.egg-info/dependency_links.txt
 src/pingram.egg-info/requires.txt
 src/pingram.egg-info/top_level.txt
+tests/test_get_me.py
+tests/test_send_audio.py
+tests/test_send_doc.py
+tests/test_send_message.py
+tests/test_send_photo.py
+tests/test_send_video.py
