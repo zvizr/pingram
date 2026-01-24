@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pingram"
-version = "0.3.3"
+version = "0.3.4"
 description = "Minimal Telegram alerting framework for bots and scripts."
 readme = "README.md"
 requires-python = ">=3.7"

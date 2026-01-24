@@ -10,3 +10,9 @@ config/secrets.*
 *.fut
 .futvenv/
 .venv
+.pingram-dev.py
+.*
+venv
+dist
+pingram.egg-info
+pyproject.toml
