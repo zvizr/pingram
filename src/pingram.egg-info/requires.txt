@@ -1,5 +1,0 @@
-httpx
-
-[dev]
-pytest
-ruff
