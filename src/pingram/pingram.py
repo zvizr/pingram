@@ -31,11 +31,18 @@ class Pingram:
     def _post(self, key: str, data: dict[str, Any], files: dict[str, Any] | None = None) -> httpx.Response:
         filtered = {k: v for k, v in data.items() if isinstance(v, (str, int, float, bool))}
         return self.client.post(url=self.endpoints[key], data=filtered, files=files, timeout=10)
+    
+    def _type(self, type_map: dict) -> bool:
+        for value, expected_type in type_map.items():
+            if not isinstance(value, expected_type):
+                raise TypeError(f"Expected {value!r} to be of type {expected_type}, got {type(value)}")
+        return True
 
     def me(self) -> httpx.Response:
         return self._get('me')
 
-    def message(self, chat_id: Union[str,int], text: str, **kwargs) -> httpx.Response:
+    def message(self, chat_id: Union[str,int], text: str, **kwargs) -> httpx.Response | str:
+        self._type({chat_id: str})
         return self._post('msg', {'chat_id': str(chat_id), 'text': text, **kwargs})
 
     def send_photo(self, chat_id: Union[str,int], path: str, caption=None, **kwargs) -> httpx.Response:
@@ -43,6 +50,8 @@ class Pingram:
         The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20
         Max file size is 10 MB
         """
+        self._type({chat_id: str, path: str})
+        
         data = {'chat_id': str(chat_id), **kwargs}
         if caption: data['caption'] = caption
         if path.startswith('http'):
@@ -56,6 +65,8 @@ class Pingram:
         Any document file format accepted
         Max file size is 50 MB
         """
+        self._type({chat_id: str, path: str})
+        
         data = {'chat_id': str(chat_id), **kwargs}
         if caption: data['caption'] = caption
         if path.startswith('http'):
@@ -69,6 +80,8 @@ class Pingram:
         Audio must be in the .MP3 or .M4A format
         Max file size is 50 MB
         """
+        self._type({chat_id: str, path: str})
+        
         data = {'chat_id': str(chat_id), **kwargs}
         if path.startswith('http'):
             data['audio'] = path
@@ -81,6 +94,8 @@ class Pingram:
         Telegram clients support MPEG4 videos (other formats may be sent as Document)
         Max file size is 50 MB
         """
+        self._type({chat_id: str, path: str})
+        
         data = {'chat_id': str(chat_id), **kwargs}
         if path.startswith('http'):
             data['video'] = path

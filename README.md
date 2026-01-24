@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/github/license/zvizr/pingram)](LICENSE)
 
 # Pingram
+
 Send Telegram messages with one line of Python. No webhooks. No bloat. Just pings.
 
 Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram messages via your bot. It’s designed as a cost-free alternative to email and SMS, focused on one-way “ping”-style messaging — ideal for alerts, reports, logs, and automated notifications.
@@ -12,7 +13,7 @@ Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram mes
 
 ---
 
-## ⚡️ Lightweight by Design
+## Lightweight by Design
 
 Pingram prioritizes size, speed, and clarity. Designed to be imported and deployed instantly.
 
@@ -36,7 +37,7 @@ Perfect for:
 - Constrained environments  
 - Clean, single-purpose automation  
 
-## ✅ Features
+## Features
 
 - Send messages, photos, documents, audio, and video
 - Direct method calls: `bot.message()`, `bot.send_photo()`, etc.
@@ -44,7 +45,7 @@ Perfect for:
 - Built on `httpx` (sync)
 - No webhook setup or event loop required
 
-## 👤 Who is it for?
+## Who is it for?
 
 - Developers who want zero-setup Telegram alerts
 - Sysadmins replacing email/SMS for cron/CI jobs
@@ -65,6 +66,7 @@ from pingram import Pingram
 bot = Pingram(token="<BOT_TOKEN>")
 bot.me()
 ```
+
 > *A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a User object.* https://core.telegram.org/bots/api#getme
 
 Since every high-level api function returns a http.Response object, you can append the end of a function call using ```.text``` to show the raw HTTP response instead of the status code.
@@ -76,7 +78,7 @@ bot.message(chat_id=123456789, text="Hello Friend").text
 This call returns a success or error message from the Telegram API.
 
 
-## 📷 Media Examples
+## Media Examples
 
 > All media-sending methods accept both local file paths and direct URLs.  
 > Ensure URLs are direct links (i.e. ending in `.jpg`, `.mp4`, `.pdf`) and serve correct `Content-Type` headers.
@@ -162,7 +164,7 @@ bot.send_video(
 ```
 
 
-## 📦 Additional Request Data
+## Additional Request Data
 
 Including additional data such as a caption, description or any other key, value types supported by the Telegram API can be passed through any API call simply by including it in the params of the function.
 
@@ -177,7 +179,7 @@ bot.send_video(
 
 > The has_spoiler parameter is a native Telegram option. It must be passed as a bool.
 
-## 💡 Benefits
+## Benefits
 
 - Zero dependencies (core only) — optional httpx for HTTP transport
 - Drop-in compatible with shell scripts, cron jobs, CI pipelines, and Python daemons
