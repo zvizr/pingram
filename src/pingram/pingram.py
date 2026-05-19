@@ -4,7 +4,7 @@
 """Pingram — sync Telegram bot wrapper for outbound pings."""
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any
 
 import httpx
 
@@ -75,7 +75,7 @@ class Pingram:
             retries=retries,
         )
 
-    def message(self, chat_id: Union[str, int], text: str, **kwargs: Any) -> httpx.Response:
+    def message(self, chat_id: str | int, text: str, **kwargs: Any) -> httpx.Response:
         raise_on_error, retries = self._pop_meta(kwargs)
         self._type({chat_id: str})
         payload = {"chat_id": str(chat_id), "text": text, **kwargs}
@@ -87,7 +87,7 @@ class Pingram:
 
     def send_photo(
         self,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         path: str,
         caption: str | None = None,
         **kwargs: Any,
@@ -96,7 +96,7 @@ class Pingram:
 
     def send_doc(
         self,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         path: str,
         caption: str | None = None,
         **kwargs: Any,
@@ -105,7 +105,7 @@ class Pingram:
 
     def send_audio(
         self,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         path: str,
         **kwargs: Any,
     ) -> httpx.Response:
@@ -113,7 +113,7 @@ class Pingram:
 
     def send_video(
         self,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         path: str,
         **kwargs: Any,
     ) -> httpx.Response:
@@ -129,7 +129,7 @@ class Pingram:
     def _send_media(
         self,
         endpoint_key: str,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         path: str,
         field: str,
         caption: str | None,

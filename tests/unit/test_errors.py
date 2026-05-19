@@ -1,6 +1,5 @@
 """Tests for the typed exception hierarchy."""
 import httpx
-import pytest
 
 
 def test_pingram_error_is_exception():

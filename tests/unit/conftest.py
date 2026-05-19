@@ -14,7 +14,6 @@ import httpx
 import pytest
 import respx
 
-
 FAKE_TOKEN = "TEST"
 TELEGRAM_BASE = f"https://api.telegram.org/bot{FAKE_TOKEN}"
 
