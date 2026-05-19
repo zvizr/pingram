@@ -61,7 +61,7 @@ class AsyncPingram:
     async def aclose(self) -> None:
         await self.client.aclose()
 
-    async def __aenter__(self) -> "AsyncPingram":
+    async def __aenter__(self) -> AsyncPingram:
         return self
 
     async def __aexit__(self, *exc_info: Any) -> None:
