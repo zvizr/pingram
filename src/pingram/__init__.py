@@ -5,10 +5,12 @@ from pingram._errors import (
     TelegramAPIError,
     TransportError,
 )
+from pingram.async_pingram import AsyncPingram
 from pingram.pingram import Pingram
 
 __all__ = [
     "Pingram",
+    "AsyncPingram",
     "PingramError",
     "TransportError",
     "TelegramAPIError",
