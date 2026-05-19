@@ -1,13 +1,14 @@
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pingram?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pingram)
 [![Python](https://img.shields.io/pypi/pyversions/pingram)](https://pypi.org/project/pingram/)
 [![PyPI version](https://badge.fury.io/py/pingram.svg)](https://badge.fury.io/py/pingram)
+[![CI](https://github.com/zvizr/pingram/actions/workflows/ci.yml/badge.svg)](https://github.com/zvizr/pingram/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/zvizr/pingram)](LICENSE)
 
 # Pingram
 
 Send Telegram messages with one line of Python. No webhooks. No bloat. Just pings.
 
-Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram messages via your bot. It’s designed as a cost-free alternative to email and SMS, focused on one-way “ping”-style messaging — ideal for alerts, reports, logs, and automated notifications.
+Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram messages via your bot. It's designed as a cost-free alternative to email and SMS, focused on one-way "ping"-style messaging — ideal for alerts, reports, logs, and automated notifications.
 
 > Looking for a minimal alternative to `python-telegram-bot`? Pingram avoids the event loop, handlers, and 7.8MB install size, focusing solely on *outbound pings* with just one method per use case.
 
@@ -19,9 +20,9 @@ Pingram prioritizes size, speed, and clarity. Designed to be imported and deploy
 
 | Package            | Size        |
 |--------------------|-------------|
-| Pingram (core)     | ~20 KB      |
-| Pingram + httpx    | ~800 KB     |
-| python-telegram-bot| ~7.8 MB     |
+| Pingram (core)     | ~20 KB      |
+| Pingram + httpx    | ~800 KB     |
+| python-telegram-bot| ~7.8 MB     |
 
 
 Result:
@@ -33,9 +34,9 @@ Result:
 
 Perfect for:
 
-- Minimal Docker containers  
-- Constrained environments  
-- Clean, single-purpose automation  
+- Minimal Docker containers
+- Constrained environments
+- Clean, single-purpose automation
 
 ## Features
 
@@ -43,6 +44,8 @@ Perfect for:
 - Direct method calls: `bot.message()`, `bot.send_photo()`, etc.
 - Minimalistic architecture (single file, no listeners or webhooks)
 - Built on `httpx` (sync)
+- Retries with backoff on transient failures (429, 5xx, network errors)
+- Typed exception hierarchy you can opt into
 - No webhook setup or event loop required
 
 ## Who is it for?
@@ -58,6 +61,8 @@ Perfect for:
 pip install pingram
 ```
 
+Requires Python 3.9 or newer.
+
 ## Quickstart
 
 ```python
@@ -69,7 +74,7 @@ bot.me()
 
 > *A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a User object.* https://core.telegram.org/bots/api#getme
 
-Since every high-level api function returns a http.Response object, you can append the end of a function call using ```.text``` to show the raw HTTP response instead of the status code.
+Since every high-level api function returns a `httpx.Response` object, you can append the end of a function call using `.text` to show the raw HTTP response instead of the status code.
 
 ```python
 bot.message(chat_id=123456789, text="Hello Friend").text
@@ -77,10 +82,9 @@ bot.message(chat_id=123456789, text="Hello Friend").text
 
 This call returns a success or error message from the Telegram API.
 
-
 ## Media Examples
 
-> All media-sending methods accept both local file paths and direct URLs.  
+> All media-sending methods accept both local file paths and direct URLs.
 > Ensure URLs are direct links (i.e. ending in `.jpg`, `.mp4`, `.pdf`) and serve correct `Content-Type` headers.
 
 ### Send Photo
@@ -163,7 +167,6 @@ bot.send_video(
 )
 ```
 
-
 ## Additional Request Data
 
 Including additional data such as a caption, description or any other key, value types supported by the Telegram API can be passed through any API call simply by including it in the params of the function.
@@ -177,44 +180,81 @@ bot.send_video(
 )
 ```
 
-> The has_spoiler parameter is a native Telegram option. It must be passed as a bool.
+> The `has_spoiler` parameter is a native Telegram option. It must be passed as a bool.
 
-## Benefits
+## Error handling
 
-- Zero dependencies (core only) — optional httpx for HTTP transport
-- Drop-in compatible with shell scripts, cron jobs, CI pipelines, and Python daemons
-- Portable single-file design — easy to vendor or embed in other tools
-- No auth handshakes or token refreshes — Telegram bots use static tokens
-- Reliable delivery with near-instant notifications across devices
-- Bypasses email blacklists and spam filters
-- Built for automation — ideal for alerts, monitoring, backups, and trading systems
-- Rich media support — send screenshots, logs, documents, audio, and video
-- Predictable return values — inspect status_code, .text, or .json() directly
-- Excellent replacement for SMTP, SMS, or third-party notification APIs
-- Runs anywhere Python runs — from Raspberry Pi to cloud VMs
-- No app approval or webhook infrastructure required
+By default, pingram preserves the 0.3.x contract: methods return the final `httpx.Response` even if it carries a non-2xx status, and transport errors propagate as their underlying `httpx` exceptions.
+
+Opt into typed exceptions with `raise_on_error=True`:
+
+```python
+from pingram import Pingram, PingramError, RateLimitError, TelegramAPIError, TransportError
+
+bot = Pingram(token="<BOT_TOKEN>", raise_on_error=True, retries=5)
+
+try:
+    bot.message(chat_id=123, text="hello")
+except RateLimitError as exc:
+    # exc.retry_after carries Telegram's suggested delay if provided
+    ...
+except TelegramAPIError as exc:
+    # non-2xx response that retries couldn't fix
+    print(exc.status_code, exc.description)
+except TransportError as exc:
+    # network/transport failure after retries exhausted
+    ...
+except PingramError:
+    # catch-all base if you prefer
+    ...
+```
+
+You can also override per call:
+
+```python
+bot.message(chat_id=123, text="hello", _raise=True, _retries=0)
+```
+
+`_raise` and `_retries` kwargs are stripped before the payload is forwarded to Telegram.
+
+## Retry policy
+
+| Condition | Behaviour |
+|---|---|
+| 2xx / 3xx | Return immediately |
+| 400, 401, 403, 404 | Fail-fast — no retry |
+| 429 | Retry; honour `parameters.retry_after` if present, else exponential backoff |
+| 5xx | Retry with exponential backoff |
+| Connection error / timeout | Retry with exponential backoff |
+
+Set `retries=0` for pre-0.4.0 behaviour (single attempt, no retries).
 
 ## Tests
 
-Pingram includes a real-world test suite (no mocks). Tests send actual messages to verify API behavior, which is useful for edge-case detection (e.g., rate limits, content type mismatches).
+Pingram ships a two-tier test suite:
 
-To run the tests:
+- **Unit tests** (`tests/unit/`) — fast, deterministic, mocked at the httpx transport layer with [`respx`](https://github.com/lundberg/respx). These run on every PR via GitHub Actions across Python 3.9–3.13.
+- **Integration tests** (`tests/integration/`) — opt-in, real-API tests that send actual messages. Useful for edge-case detection (rate limits, content-type mismatches). Require `BOT_TOKEN` + `CHAT_ID` env vars and are run from `main` only.
+
+To run them locally:
 
 ```bash
-# Ensure .env has BOT_TOKEN and CHAT_ID
-# .env example:
-# BOT_TOKEN=123456789:ABCDEF
-# CHAT_ID=123456789
+# Unit tests (no creds required)
 pytest
-# To include test failure messages you can use:
-pytest -rs
+
+# Integration tests (real-API, .env with BOT_TOKEN + CHAT_ID)
+pytest tests/integration -m integration
 ```
 
-## Planned features
+## Roadmap
 
-- Retry and error handling
-- Async mode (httpx.AsyncClient)
-- Message templating engine
-- Std input/message collectors
-- Webhook-to-Telegram bridge
-- Package tests and CI integration
+- [x] Retry and error handling
+- [x] Package tests and CI integration
+- [ ] Async mode (`httpx.AsyncClient`)
+- [ ] Message templating engine
+- [ ] Std input/message collectors
+- [ ] Webhook-to-Telegram bridge
+
+---
+
+Maintained — [issues and PRs](https://github.com/zvizr/pingram/issues) welcome.

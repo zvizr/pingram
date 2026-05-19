@@ -1,10 +1,12 @@
-from pingram import Pingram
-
 import os
 import time
 
-from dotenv import load_dotenv
 import pytest
+from dotenv import load_dotenv
+
+from pingram import Pingram
+
+pytestmark = pytest.mark.integration
 
 load_dotenv()
 TOKEN = os.getenv('BOT_TOKEN') or ''
