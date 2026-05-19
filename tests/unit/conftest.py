@@ -1,14 +1,15 @@
 """Unit-test fixtures.
 
 These tests do NOT touch the real Telegram API. All HTTP traffic is mocked at
-the httpx transport layer via respx. Sleep calls in the retry executor are
-patched out so the suite runs in milliseconds regardless of backoff config.
+the httpx transport layer via respx. Sleep calls in both the sync and async
+retry executors are patched out so the suite runs in milliseconds regardless
+of backoff config.
 """
 from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import httpx
 import pytest
@@ -46,8 +47,24 @@ def ok_response_factory() -> Callable[..., httpx.Response]:
 
 @pytest.fixture
 def mock_sleep(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
-    """Patches the retry executor's sleep function so backoff is instant.
-    Returns a MagicMock so tests can assert on the durations passed."""
+    """Patches both the sync retry executor's `time.sleep` and the async
+    executor's `asyncio.sleep` so backoff is instant. Returns a MagicMock that
+    receives every sleep call (sync or async) so tests can assert on durations.
+
+    The single returned MagicMock collects both kinds of calls. Tests that only
+    care about call_count or asserted durations don't need to know which
+    executor invoked sleep.
+
+    The async-side patch is guarded with try/except so this fixture works even
+    before `_retry.py` has imported `asyncio` (i.e. it's safe to add this
+    fixture extension before the async executor lands)."""
     sleep = MagicMock()
+    async_sleep = AsyncMock(side_effect=lambda d: sleep(d))
     monkeypatch.setattr("pingram._retry.time.sleep", sleep)
+    try:
+        monkeypatch.setattr("pingram._retry.asyncio.sleep", async_sleep)
+    except (AttributeError, ImportError):
+        # asyncio not yet imported in _retry.py; only sync tests run.
+        # Once the async executor lands (Task 5), this branch stops firing.
+        pass
     return sleep
