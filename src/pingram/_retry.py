@@ -10,12 +10,17 @@ documented in the design spec:
   Other backoff: exponential with jitter, capped
 
 The executor is sleep-injectable for tests via the module-level `time.sleep`
-binding (tests patch `pingram._retry.time.sleep`)."""
+binding (tests patch `pingram._retry.time.sleep`).
+
+`execute_with_retry_async` is the awaitable sibling. Same policy, different
+sleep primitive (`asyncio.sleep`), different invocation (`await request_fn()`).
+Tests patch `pingram._retry.asyncio.sleep`."""
 from __future__ import annotations
 
+import asyncio
 import random
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 import httpx
@@ -38,9 +43,7 @@ def execute_with_retry(
     *,
     retries: int = 3,
 ) -> httpx.Response:
-    """Run `request_fn` up to (1 + retries) times applying the pingram retry
-    policy. Returns the final `httpx.Response`. Re-raises the last
-    `httpx.RequestError` if every attempt failed at the transport layer."""
+    """Sync retry executor. See module docstring for the policy."""
     max_attempts = retries + 1
     last_transport_error: BaseException | None = None
     for attempt in range(max_attempts):
@@ -68,16 +71,55 @@ def execute_with_retry(
             time.sleep(_backoff_seconds(attempt))
             continue
 
-        return response  # 2xx, 3xx, or any other non-retryable status
+        return response
 
-    # Defensive: loop should always exit via return or raise above.
+    assert last_transport_error is not None
+    raise last_transport_error
+
+
+async def execute_with_retry_async(
+    request_fn: Callable[[], Awaitable[httpx.Response]],
+    *,
+    retries: int = 3,
+) -> httpx.Response:
+    """Async retry executor. Mirror of `execute_with_retry` with `await
+    request_fn()` and `await asyncio.sleep(...)`."""
+    max_attempts = retries + 1
+    last_transport_error: BaseException | None = None
+    for attempt in range(max_attempts):
+        try:
+            response = await request_fn()
+        except _RETRYABLE_TRANSPORT_EXCEPTIONS as exc:
+            last_transport_error = exc
+            if attempt + 1 >= max_attempts:
+                raise
+            await asyncio.sleep(_backoff_seconds(attempt))
+            continue
+
+        if response.status_code in _FAIL_FAST_STATUSES:
+            return response
+
+        if response.status_code == 429:
+            if attempt + 1 >= max_attempts:
+                return response
+            await asyncio.sleep(_retry_after_seconds(response) or _backoff_seconds(attempt))
+            continue
+
+        if 500 <= response.status_code < 600:
+            if attempt + 1 >= max_attempts:
+                return response
+            await asyncio.sleep(_backoff_seconds(attempt))
+            continue
+
+        return response
+
     assert last_transport_error is not None
     raise last_transport_error
 
 
 def _backoff_seconds(attempt: int) -> float:
     """Exponential backoff with full jitter. attempt is 0-indexed."""
-    base = min(2 ** attempt, 4)  # cap at 4s base
+    base = min(2 ** attempt, 4)
     return random.uniform(0, base)
 
 
