@@ -6,6 +6,8 @@ import time
 from dotenv import load_dotenv
 import pytest
 
+pytestmark = pytest.mark.integration
+
 load_dotenv()
 TOKEN = os.getenv('BOT_TOKEN') or ''
 CHAT_ID = os.getenv('CHAT_ID') or ''
