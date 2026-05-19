@@ -18,11 +18,12 @@ Pingram is an ultra-lightweight Python wrapper for sending outbound Telegram mes
 
 Pingram prioritizes size, speed, and clarity. Designed to be imported and deployed instantly.
 
-| Package            | Size        |
-|--------------------|-------------|
-| Pingram (core)     | ~20 KB      |
-| Pingram + httpx    | ~800 KB     |
-| python-telegram-bot| ~7.8 MB     |
+| Package                  | Size        |
+|--------------------------|-------------|
+| Pingram (core)           | ~20 KB      |
+| Pingram + AsyncPingram   | ~21 KB      |
+| Pingram + httpx          | ~800 KB     |
+| python-telegram-bot      | ~7.8 MB     |
 
 
 Result:
@@ -42,11 +43,12 @@ Perfect for:
 
 - Send messages, photos, documents, audio, and video
 - Direct method calls: `bot.message()`, `bot.send_photo()`, etc.
-- Minimalistic architecture (single file, no listeners or webhooks)
-- Built on `httpx` (sync)
+- **Sync and async clients** — `Pingram` (sync) + `AsyncPingram` (async) with identical APIs
+- Minimalistic architecture, no listeners or webhooks
+- Built on `httpx` (sync + async)
 - Retries with backoff on transient failures (429, 5xx, network errors)
 - Typed exception hierarchy you can opt into
-- No webhook setup or event loop required
+- No webhook setup required
 
 ## Who is it for?
 
@@ -81,6 +83,46 @@ bot.message(chat_id=123456789, text="Hello Friend").text
 ```
 
 This call returns a success or error message from the Telegram API.
+
+## Async usage
+
+For asyncio applications, FastAPI handlers, Jupyter notebooks, or anywhere you want to fire multiple pings concurrently, use `AsyncPingram`. It mirrors the sync API exactly — same methods, same kwargs, same typed errors.
+
+```python
+import asyncio
+from pingram import AsyncPingram
+
+async def main():
+    async with AsyncPingram(token="<BOT_TOKEN>") as bot:
+        await asyncio.gather(
+            bot.message(chat_id=123, text="step 1 done"),
+            bot.message(chat_id=123, text="step 2 done"),
+            bot.send_photo(chat_id=123, path="chart.png"),
+        )
+
+asyncio.run(main())
+```
+
+Three supported lifecycle shapes:
+
+```python
+# 1. async with (recommended — guarantees client cleanup)
+async with AsyncPingram(token="...") as bot:
+    await bot.message(chat_id=123, text="hi")
+
+# 2. manual aclose (parity with how Pingram is used)
+bot = AsyncPingram(token="...")
+try:
+    await bot.message(chat_id=123, text="hi")
+finally:
+    await bot.aclose()
+
+# 3. fire-and-forget (allowed but emits a resource warning at GC time)
+bot = AsyncPingram(token="...")
+await bot.message(chat_id=123, text="hi")
+```
+
+Retries, typed errors (`PingramError`, `TelegramAPIError`, `RateLimitError`, `TransportError`), and per-call `_raise` / `_retries` overrides all work identically to the sync `Pingram`. See the **Error handling** and **Retry policy** sections below.
 
 ## Media Examples
 
@@ -250,7 +292,7 @@ pytest tests/integration -m integration
 
 - [x] Retry and error handling
 - [x] Package tests and CI integration
-- [ ] Async mode (`httpx.AsyncClient`)
+- [x] Async mode (`AsyncPingram`)
 - [ ] Message templating engine
 - [ ] Std input/message collectors
 - [ ] Webhook-to-Telegram bridge
