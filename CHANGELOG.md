@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-05-20
+
+### Added
+- **`AsyncPingram` class** — async sibling of `Pingram` with `await` semantics on every public method (`me`, `message`, `send_photo`, `send_doc`, `send_audio`, `send_video`). Mirrors the sync API exactly: same constructor kwargs (`retries`, `raise_on_error`, `timeout`), same typed errors, same `_raise` / `_retries` per-call overrides.
+- **`async with` context manager** — `async with AsyncPingram(...) as bot:` guarantees `httpx.AsyncClient` cleanup. Manual `await bot.aclose()` also supported.
+- **`execute_with_retry_async`** — async retry executor mirroring the 0.4.0 sync policy (429 retry-after, 5xx exponential backoff, fail-fast on 400/401/403/404).
+- **`Framework :: AsyncIO`** trove classifier.
+
+### Compatibility
+- Zero behavioural change for existing 0.4.0 sync `Pingram` callers. `pip install -U pingram` from any 0.4.x is a no-op behaviourally — the sync class is unchanged.
+
 ## [0.4.0] - 2026-05-19
 
 ### Added
