@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pingram"
-version = "0.4.0"
+version = "0.5.0"
 description = "Minimal Telegram alerting framework for bots and scripts."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -16,7 +16,7 @@ dependencies = ["httpx"]
 keywords = [
   "telegram", "bot", "alert", "notification", "notifier", "push",
   "messaging", "python", "minimal", "selfhosted", "cli",
-  "automation", "infra", "monitoring"
+  "automation", "infra", "monitoring", "async"
 ]
 
 classifiers = [
@@ -31,10 +31,11 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Communications :: Chat",
+  "Framework :: AsyncIO",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "respx>=0.21", "ruff>=0.5", "python-dotenv>=1.0"]
+dev = ["pytest>=7", "respx>=0.21", "ruff>=0.5", "python-dotenv>=1.0", "pytest-asyncio>=0.23"]
 
 [project.urls]
 Homepage = "https://github.com/zvizr/pingram"
@@ -50,6 +51,7 @@ exclude = ["tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/unit"]
+asyncio_mode = "auto"
 markers = [
     "integration: real-API tests; require BOT_TOKEN + CHAT_ID env vars",
 ]
