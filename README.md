@@ -259,6 +259,41 @@ bot.message(chat_id=123, text="hello", _raise=True, _retries=0)
 
 `_raise` and `_retries` kwargs are stripped before the payload is forwarded to Telegram.
 
+## MarkdownV2 escaping
+
+Telegram's MarkdownV2 parse mode needs backslash-escaping for a long list of characters. Pingram ships three small helpers so you don't have to remember which is which:
+
+```python
+from pingram import (
+    escape_markdown_v2,
+    escape_markdown_v2_code,
+    escape_markdown_v2_link_url,
+)
+
+# Plain text body
+bot.message(
+    chat_id=123,
+    text=f"⚠️ *{escape_markdown_v2(hostname)}* is down",
+    parse_mode="MarkdownV2",
+)
+
+# Inside an inline code span (only backtick and backslash need escaping)
+bot.message(
+    chat_id=123,
+    text=f"Run `{escape_markdown_v2_code(command)}` to retry",
+    parse_mode="MarkdownV2",
+)
+
+# Inside a link URL (only `)` and backslash need escaping)
+bot.message(
+    chat_id=123,
+    text=f"[details]({escape_markdown_v2_link_url(url)})",
+    parse_mode="MarkdownV2",
+)
+```
+
+The helpers are pure functions — no `await`, no client needed.
+
 ## Retry policy
 
 | Condition | Behaviour |
