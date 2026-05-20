@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-05-20
+
+### Added
+- **MarkdownV2 escape helpers** — three small functions for safely embedding values in MarkdownV2 messages:
+  - `escape_markdown_v2(text)` for plain message bodies
+  - `escape_markdown_v2_code(text)` for inline code spans and pre blocks
+  - `escape_markdown_v2_link_url(url)` for the URL portion of `[label](url)` links
+
+### Compatibility
+- No behavioural change to `Pingram` or `AsyncPingram`. Purely additive.
+
 ## [0.5.0] - 2026-05-20
 
 ### Added
