@@ -1,7 +1,6 @@
 """Tests for MarkdownV2 escape helpers."""
 import pytest
 
-
 # --- escape_markdown_v2 (text context) -------------------------------------
 
 def test_empty_string_returns_empty():

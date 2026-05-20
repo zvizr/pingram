@@ -6,6 +6,11 @@ from pingram._errors import (
     TransportError,
 )
 from pingram.async_pingram import AsyncPingram
+from pingram.markdown import (
+    escape_markdown_v2,
+    escape_markdown_v2_code,
+    escape_markdown_v2_link_url,
+)
 from pingram.pingram import Pingram
 
 __all__ = [
@@ -15,4 +20,7 @@ __all__ = [
     "TransportError",
     "TelegramAPIError",
     "RateLimitError",
+    "escape_markdown_v2",
+    "escape_markdown_v2_code",
+    "escape_markdown_v2_link_url",
 ]
