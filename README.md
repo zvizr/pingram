@@ -1,6 +1,6 @@
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pingram?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pingram)
 [![Python](https://img.shields.io/pypi/pyversions/pingram)](https://pypi.org/project/pingram/)
-[![PyPI version](https://badge.fury.io/py/pingram.svg)](https://badge.fury.io/py/pingram)
+[![PyPI version](https://img.shields.io/pypi/v/pingram.svg)](https://pypi.org/project/pingram/)
 [![CI](https://github.com/zvizr/pingram/actions/workflows/ci.yml/badge.svg)](https://github.com/zvizr/pingram/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/zvizr/pingram)](LICENSE)
 
