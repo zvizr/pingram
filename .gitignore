@@ -30,3 +30,6 @@ venv/
 
 # Local dev scripts
 .pingram-dev.py
+
+# Internal-only design docs (kept outside the repo)
+docs/superpowers/
